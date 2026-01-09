@@ -160,17 +160,17 @@ NPML翻译器定义为：可以将NPML代码转化为目标编程语言的编程
 ```text
 docs/
     project.md
-    subproject-1/
-        subproject-1.md
-        module-1/
-            module-1.md
-            function/
-                function-1.md
-                function-2.md
+    name1-subproject/
+        name1-subproject.md
+        name1-module/
+            name1-module.md
+            functions/
+                name1-function.md
+                name2-function.md
                 ...
         module-2/
             ...
-    subproject-2/
+    name2-subproject/
         ...
 ```
 
@@ -184,11 +184,22 @@ docs/
 
 开发时，需要向AI通过从项目到功能这个链路上的全部文档，将该链的文档路称为上下文链，例如：
 
-参考上面的架构，开发function-1时，提供子项目1->模块1->功能1链路上的文档：subproject.md、module.md和function-1.md。
+参考上面的架构，开发name1-function时，提供子项目1->模块1->功能1链路上的文档：name1-subproject.md、name1-module.md和name1-function.md。
 
 除了开发的功能的上下文链，还要提供功能的依赖功能的上下文链，将这些上下文链相同的文档合并（只保留一个文档），然后提交给AI。
 
 AI根据上下文链编写代码实现功能。
+
+上下文链的具体形式是多个文档合并而来的文档，其中的每个文档顶部会使用`//`表明文件路径和文件名称，例如：
+```markdown
+// docs/project/main-subproject/login-module/functions/jwt-function.md
+这里是jwt-function.md的内容....
+
+// docs/project/main-subproject/front-module/functions/view-function.md
+这里是正文...
+
+...
+```
 
 #### 新功能添加
 
@@ -230,6 +241,8 @@ AI获取需求文档后，从项目层次开始，查看项目文档中的子项
 每个层次的文档命名规则为：`名称-层次名称`纯英文，例如一个名为前端的子项目`frontend-subproject`；一个名为用户登录的功能`login-function`。
 
 特别地，项目文档的名称只能是：`project.md`。
+
+文件夹以当前的层次文档命名，特别地，模块下的功能文档存储在名为`functions`的文件夹下。
 
 ### 2.5 反向传播
 
@@ -375,3 +388,9 @@ Agent如果需要调用工具，必须按照如下格式输出工具调用请求
 ## 四、在传播式工作流中调用NPML
 
 在Agent进行编码任务时，在上下文链中可以添加NPML代码，以更细腻的代码级描述辅助Agent进行编码。
+
+除了NPML代码，还要在上下文链中添加NPML语法和规范文档。
+
+### 4.1 NPML优先级
+
+Agent要以NPML代码为最高实现优先级，即具体的实现流程方法要以NPML代码为前提。如果NPML代码有明显错误，可以不遵守，但是必须在任务结果中指明NPML代码的问题。
